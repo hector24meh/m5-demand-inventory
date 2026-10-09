@@ -1,0 +1,32 @@
+[project]
+name = "m5-demand-inventory"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Héctor", email = "hector_roge@hotmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "jupyterlab>=4.6.4",
+    "kaggle>=2.2.4",
+    "lightgbm>=4.7.0",
+    "matplotlib>=3.11.2",
+    "mlforecast>=1.1.0",
+    "numpy>=2.5.3",
+    "pandas>=2.3.3",
+    "plotly>=7.1.0",
+    "polars>=2.0.0",
+    "pulp>=4.0.0",
+    "pyarrow>=26.0.0",
+    "scikit-learn>=1.9.1",
+    "statsforecast>=2.1.1",
+    "utilsforecast>=0.2.17",
+]
+
+[project.scripts]
+m5-demand-inventory = "m5_demand_inventory:main"
+
+[build-system]
+requires = ["uv_build>=0.12.24,<0.13.0"]
+build-backend = "uv_build"
