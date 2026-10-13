@@ -1,5 +1,5 @@
 """Exporta el resumen del proyecto M5 a JSON para la página del portafolio.
-Uso: uv run python src/export_web.py   (después de ejecutar los notebooks 04 a 08)"""
+Uso: uv run python src/export_web.py   (después de ejecutar los notebooks 04 a 11)"""
 import json
 from pathlib import Path
 
@@ -110,8 +110,52 @@ kpis.update({
     "detector_precision_pct": round(float((1 - fa["agotado_sintetico_pct"].mean() / fa["agotado_observado_pct"].mean()) * 100), 0),
 })
 
+# --- Extensiones: reentrenamiento (09), 10 tiendas (10) y LightGBM cuantílico (11) ---
+reent = pd.read_csv(REP / "reentrenamiento_resumen_CA_1.csv", index_col=0).rename_axis("modelo").reset_index()
+tiendas = pd.read_csv(REP / "multitienda_resumen.csv")
+prob = pd.read_csv(REP / "probabilistico_resumen_CA_1.csv", index_col=0).rename_axis("politica").reset_index()
+prob["clave"] = prob["politica"].map({"LGB + stock empírico (actual)": "actual",
+                                      "LGB directo 13 d + stock empírico": "directo",
+                                      "LGB cuantílico": "cuantilico",
+                                      "LGB cuantílico + conformal": "conformal"})
+cob = pd.read_csv(REP / "probabilistico_cobertura_CA_1.csv").rename(columns={
+    "LGB + stock empírico (actual)": "actual", "LGB directo 13 d + stock empírico": "directo",
+    "LGB cuantílico": "cuantilico", "LGB cuantílico + conformal": "conformal"})
+ic_prob = pd.read_csv(REP / "probabilistico_bootstrap_CA_1.csv")
+ic_prob["clave"] = ic_prob["comparacion"].map({
+    "LGB cuantílico vs. AutoETS corregido": "cuantilico_vs_autoets_imp",
+    "LGB cuantílico vs. TSB corregido": "cuantilico_vs_tsb_imp",
+    "LGB cuantílico vs. LGB actual": "cuantilico_vs_actual",
+    "LGB directo vs. LGB actual": "directo_vs_actual",
+    "LGB cuantílico vs. LGB directo": "cuantilico_vs_directo",
+    "LGB cuantílico vs. TSB con ventas": "cuantilico_vs_tsb"})
+
+
+def ic_de(clave, metrica):
+    r = ic_prob[(ic_prob["clave"] == clave) & (ic_prob["metrica"] == metrica)].iloc[0]
+    return {k: round(float(r[k]), 1) for k in ["cambio_pct", "ic95_inf", "ic95_sup"]}
+
+
+kpis.update({
+    "tiendas_censura_costo_prom_pct": round(float(tiendas["censura_costo_pct"].mean()), 1),
+    "tiendas_censura_costo_min_pct": round(float(tiendas["censura_costo_pct"].max()), 1),
+    "tiendas_censura_costo_max_pct": round(float(tiendas["censura_costo_pct"].min()), 1),
+    "tiendas_censura_inv_prom_pct": round(float(tiendas["censura_inv95_pct"].mean()), 1),
+    "cuantilico_vs_autoets_imp": ic_de("cuantilico_vs_autoets_imp", "costo"),
+    "cuantilico_vs_autoets_imp_inv": ic_de("cuantilico_vs_autoets_imp", "inv95"),
+    "cuantilico_vs_tsb": ic_de("cuantilico_vs_tsb", "costo"),
+    "reentreno_costo_pct": round(float(reent.set_index("modelo").loc["LGB_reentrenado", "vs_LGB_%_costo"]), 1),
+})
+
 resumen = {
     "kpis": kpis,
+    "extensiones": {
+        "tiendas": registros(tiendas),
+        "probabilistico": registros(prob.drop(columns="politica")),
+        "cobertura": registros(cob),
+        "ic_probabilistico": registros(ic_prob[["clave", "metrica", "cambio_pct", "ic95_inf", "ic95_sup", "prob_ahorro"]]),
+        "reentrenamiento": registros(reent),
+    },
     "ablacion": {
         "tradeoff": registros(abl[["modelo", "alpha", "fill_rate", "inv_valor_prom", "dias_cobertura", "costo_total"]]),
         "resumen": registros(abl_res),
