@@ -1,0 +1,11 @@
+comparacion,metrica,cambio_pct,ic95_inf,ic95_sup,prob_ahorro
+Censura · TSB (demanda corregida vs. ventas),Costo total óptimo,-27.592432834200366,-31.818032099626212,-23.526247408926583,1.0
+Censura · TSB (demanda corregida vs. ventas),Inventario a fill rate 95%,-23.770246896133397,-34.45349124505179,-18.78603687442104,1.0
+Censura · AutoETS (demanda corregida vs. ventas),Costo total óptimo,-24.691813402237262,-29.741398030334715,-19.651862006551784,1.0
+Censura · AutoETS (demanda corregida vs. ventas),Inventario a fill rate 95%,-23.847306082199015,-33.35341888801156,-15.498274166577865,1.0
+Modelo · LightGBM vs. AutoETS corregido,Costo total óptimo,2.590501776116505,-1.357850671851062,6.03819723798408,0.0875
+Modelo · LightGBM vs. AutoETS corregido,Inventario a fill rate 95%,-0.31382413115603747,-4.861673864904026,3.9298425618715496,0.55
+Modelo · LightGBM vs. TSB corregido,Costo total óptimo,2.0553837591470003,-0.9820208049726464,5.323783558315991,0.091
+Modelo · LightGBM vs. TSB corregido,Inventario a fill rate 95%,-1.7582787654021548,-5.7694875188427615,2.022915193356061,0.829
+Original · LightGBM vs. TSB con ventas,Costo total óptimo,-26.104179458281063,-31.413730715949335,-21.105972291277457,1.0
+Original · LightGBM vs. TSB con ventas,Inventario a fill rate 95%,-25.110578457877164,-35.441048824377,-19.598945349773775,1.0
